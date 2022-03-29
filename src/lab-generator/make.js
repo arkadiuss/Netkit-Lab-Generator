@@ -84,7 +84,8 @@ function makeOther(netkit, lab) {
 		if (machine.name && machine.name != "" && machine.type == "other" && machine.other.image) {
 			lab.file["lab.conf"] += machine.name + '[image]="' + machine.other.image + '"\n';
 			for (let file of machine.other.files) {
-				lab.file["/etc/scripts/" + file.name] = file.contents;
+				lab.folders.push(machine.name + "/etc/scripts/");
+				lab.file[machine.name + "/etc/scripts/" + file.name] = file.contents;
 			}
 		}
 	}
@@ -383,9 +384,13 @@ function makeStaticRouting(netkit, lab) {
 						interface.ip = "192.168.100.1/24";
 					}
 				}
+				if(interface.mac_address && interface.mac_address != "") {
+					lab.file[machine.name + ".startup"] += "ip link set eth" + interface.eth.number + " address  " + interface.mac_address + "\n";
+				}
 				//ifconfig eth_ SELFADDRESS/MASK up
 				if (interface.eth.domain && interface.eth.domain != "" && interface.ip && interface.ip != "") {
-					lab.file[machine.name + ".startup"] += "ifconfig eth" + interface.eth.number + " " + interface.ip + " up\n";
+					const ip_without_mask = interface.ip.substring(0, interface.ip.indexOf('/'))
+					lab.file[machine.name + ".startup"] += "ifconfig eth" + interface.eth.number + " " + ip_without_mask + " up\n";
 				}
 			}
 
@@ -488,7 +493,7 @@ function makeFilesStructure(netkit, labInfo) {
 
 function makeScript(lab) {
 	let text = "#! /bin/sh\n"
-		+ "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file. The script will self-destruct\n"
+		+ "# Remember to use 'chmod +x' (o 'chmod 500') on the .sh file\n"
 		+ "\n"
 		+ "rm -rf \"$(dirname \"$0\")/lab\"\n"
 		+ "mkdir \"$(dirname \"$0\")/lab\"\n"
@@ -506,7 +511,7 @@ function makeScript(lab) {
 		}
 	}
 
-	text += "\nrm \"../$0\"\n";
+	// text += "\nrm \"../$0\"\n";
 	return text;
 }
 

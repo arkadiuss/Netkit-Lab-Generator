@@ -229,6 +229,10 @@
 												<input type="text" data-ng-model="i.eth.domain" class="form-control" placeholder="A" required />
 											</div>
 											<div data-ng-show="machine.type!='switch'">
+												<label> Mac address: </label>
+												<input type="text" data-ng-model="i.mac_address" class="form-control" placeholder="00:00:00:00:00:00" pattern="(^$)|^[0-9a-f]{2}(:[0-9a-f]{2}){5}$"/>
+											</div>
+											<div data-ng-show="machine.type!='switch'">
 												<label> IP/Net: </label>
 												<input type="text" data-ng-model="i.ip" class="form-control" placeholder="0.0.0.0/0" pattern="(^$)|(((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}/[0-9]+$)" />
 											</div>
